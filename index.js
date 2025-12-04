@@ -81,6 +81,6 @@ wss.on('connection', (ws, req) => {
   });
 });
 
-server.listen(12212, '127.0.0.1', () => {
+server.listen(12212, '0.0.0.0', () => {
   console.log('[mock-printer] listening at ws://127.0.0.1:12212/printer');
 });
