@@ -1,6 +1,7 @@
 // real-printer.js
 // WebSocket → TEXT-only ESC/POS print server for Raspberry Pi + Epson TM-T20III
 
+const fs = require("fs");
 const http = require("http");
 const WebSocket = require("ws");
 const { printLines } = require("./printer-device");
