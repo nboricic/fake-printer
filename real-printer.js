@@ -5,6 +5,8 @@ const http = require("http");
 const WebSocket = require("ws");
 const { printLines } = require("./printer-device");
 
+
+
 // Top-level payload handler: TEXT ONLY
 function handlePrintPayload(payload, done) {
   // 1) Your main case: KITCHEN_TICKET with lines[]
@@ -28,8 +30,12 @@ function handlePrintPayload(payload, done) {
   return printLines([json, "", ""], done);
 }
 
+// Load TLS cert + key
+const key = fs.readFileSync("/etc/printer-wss/printer.key");
+const cert = fs.readFileSync("/etc/printer-wss/printer.crt");
+
 // HTTP + WebSocket server
-const server = http.createServer();
+const server = http.createServer({ key, cert });
 const wss = new WebSocket.Server({ server, path: "/printer" });
 
 wss.on("connection", (ws, req) => {
@@ -116,6 +122,6 @@ wss.on("connection", (ws, req) => {
 const PORT = 12212;
 server.listen(PORT, "0.0.0.0", () => {
   console.log(
-    `[printer-ws] listening on ws://0.0.0.0:${PORT}/printer (try ws://printer-pi.local:${PORT}/printer)`
+    `[printer-ws] listening on wss://0.0.0.0:${PORT}/printer (try ws://printer-pi.local:${PORT}/printer)`
   );
 });
