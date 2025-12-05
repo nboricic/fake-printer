@@ -6,11 +6,11 @@ const https = require("https");
 const WebSocket = require("ws");
 const { printLines } = require("./printer-device");
 
-
-
-// Top-level payload handler: TEXT ONLY
+// --------------------
+// 1. Payload handler
+// --------------------
 function handlePrintPayload(payload, done) {
-  // 1) Your main case: KITCHEN_TICKET with lines[]
+  // 1) Main case: KITCHEN_TICKET with lines[]
   if (payload && payload.type === "KITCHEN_TICKET" && Array.isArray(payload.lines)) {
     return printLines(payload.lines, done);
   }
@@ -31,14 +31,23 @@ function handlePrintPayload(payload, done) {
   return printLines([json, "", ""], done);
 }
 
-// Load TLS cert + key
+// --------------------
+// 2. HTTPS + WSS setup
+// --------------------
+
+// Load TLS cert + key (make sure these files exist)
 const key = fs.readFileSync("/etc/printer-wss/printer.key");
 const cert = fs.readFileSync("/etc/printer-wss/printer.crt");
 
-// HTTP + WebSocket server
+// HTTPS server (not plain HTTP anymore)
 const server = https.createServer({ key, cert });
+
+// WebSocket server bound to HTTPS server
 const wss = new WebSocket.Server({ server, path: "/printer" });
 
+// --------------------
+// 3. WebSocket handling
+// --------------------
 wss.on("connection", (ws, req) => {
   const ip = req.socket.remoteAddress;
   console.log("[printer-ws] client connected from", ip, "url:", req.url);
@@ -120,9 +129,12 @@ wss.on("connection", (ws, req) => {
   });
 });
 
+// --------------------
+// 4. Start server
+// --------------------
 const PORT = 12212;
 server.listen(PORT, "0.0.0.0", () => {
   console.log(
-    `[printer-ws] listening on wss://0.0.0.0:${PORT}/printer (try ws://printer-pi.local:${PORT}/printer)`
+    `[printer-ws] listening on wss://0.0.0.0:${PORT}/printer (e.g. wss://printerpi.local:${PORT}/printer)`
   );
 });
