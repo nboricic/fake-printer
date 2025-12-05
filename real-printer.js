@@ -2,7 +2,7 @@
 // WebSocket → TEXT-only ESC/POS print server for Raspberry Pi + Epson TM-T20III
 
 const fs = require("fs");
-const http = require("http");
+const https = require("https");
 const WebSocket = require("ws");
 const { printLines } = require("./printer-device");
 
@@ -36,7 +36,7 @@ const key = fs.readFileSync("/etc/printer-wss/printer.key");
 const cert = fs.readFileSync("/etc/printer-wss/printer.crt");
 
 // HTTP + WebSocket server
-const server = http.createServer({ key, cert });
+const server = https.createServer({ key, cert });
 const wss = new WebSocket.Server({ server, path: "/printer" });
 
 wss.on("connection", (ws, req) => {
