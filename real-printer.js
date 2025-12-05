@@ -40,7 +40,10 @@ const key = fs.readFileSync("/etc/printer-wss/printer.key");
 const cert = fs.readFileSync("/etc/printer-wss/printer.crt");
 
 // HTTPS server (not plain HTTP anymore)
-const server = https.createServer({ key, cert });
+const server = https.createServer({ key, cert }, (req, res) => {
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Printer WSS server is alive.\nPath for WebSocket: /printer\n");
+});
 
 // WebSocket server bound to HTTPS server
 const wss = new WebSocket.Server({ server, path: "/printer" });
