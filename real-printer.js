@@ -52,6 +52,17 @@ const wss = new WebSocket.Server({ server, path: "/printer" });
 // 3. WebSocket handling
 // --------------------
 wss.on("connection", (ws, req) => {
+
+  console.log(
+    "[printer-ws] client connected from",
+    req.socket.remoteAddress,
+    "url:",
+    req.url,
+    "currently:",
+    wss.clients.size,
+    "clients"
+  );
+
   const ip = req.socket.remoteAddress;
   console.log("[printer-ws] client connected from", ip, "url:", req.url);
 
